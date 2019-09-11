@@ -38,6 +38,16 @@ class Layer {
     delete data.color;
   }
 
+    replace(pix) {
+      for(let i=0; i< pix.length; i++) {
+        const row = pix[i];
+        for(let j = 0; j < row.length; j++) {
+          this.setData(i, j, row[j]);
+        }
+      }
+    }
+
+
   mirrorXAxis(layer) {
     // if horizontal: from 0 to 15 == from 31 to 16
     // { x: 0, y: 0, }
@@ -112,4 +122,37 @@ class Layer {
     return layer;
   }
 
+}
+
+class RotationLayer extends Layer {
+  constructor(parent) {
+    super(parent.width, parent.height);
+    this.parent = parent;
+  }
+
+  update() {
+    this.parent.rotate(this);
+  }
+}
+
+class MirrorYLayer extends Layer {
+  constructor(parent) {
+    super(parent.width, parent.height);
+    this.parent = parent;
+  }
+
+  update() {
+    this.parent.mirrorYAxis(this);
+  }
+}
+
+class MirrorXLayer extends Layer {
+  constructor(parent) {
+    super(parent.width, parent.height);
+    this.parent = parent;
+  }
+
+  update() {
+    this.parent.mirrorXAxis(this);
+  }
 }

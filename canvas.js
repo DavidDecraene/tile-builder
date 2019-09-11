@@ -3,9 +3,11 @@
 class Canvas {
   constructor(scale = 1, opts = {}) {
 
-    this.options = { ... { editor: false,
+    this.options = { ... {
+      rotation: 0,
+      editor: false,
       w: 32, h: 32,
-      transparent: '#fff', grid: false, createElement: true,
+      transparent: '#fff', grid: false, createElement: false,
       x: 0, y: 0}, ... opts };
     this.scale = scale;
     this.layers = [];
@@ -52,11 +54,6 @@ class Canvas {
     return this.options.h;
   }
 
-  setImage($image) {
-    this.image = new CanvasImage(this, $image);
-    return this;
-  }
-
   mainLayer(layer) {
     this.layer = layer;
     this.addLayer(layer);
@@ -88,9 +85,14 @@ class Canvas {
     this.ctx.clearRect(cx, cy, this.scale * this.width, this.scale * this.height);
   }
 
+  getLayers() {
+    return this.layers;
+  }
+
   draw(layers) {
-    if (!layers) { layers = this.layers; }
+    if (!layers) { layers = this.getLayers(); }
     const ctx = this.ctx ;
+    ctx.save();
     const cx = this.options.x;
     const cy = this.options.y;
     this.clear();
@@ -127,26 +129,7 @@ class Canvas {
           ctx.stroke();
         }
       }
+      ctx.restore();
     });
-  }
-
-  toPng(img) {
-    const url = this.canvas.toDataURL();
-    if (!img) {
-      img = document.createElement('img');
-      document.body.appendChild(img);
-    }
-    img.src = url;
-    return img;
-
-    /**
-     * var downloadImage = function(data, filename) {
-          var a = document.createElement('a');
-          a.href = data;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-      };
-     */
   }
 }

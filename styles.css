@@ -50,3 +50,5 @@
 .stage-body > *, .previews > * {
   margin-right: 10px;
 }
+
+.tileset canvas { border: 1px solid #ccc; }

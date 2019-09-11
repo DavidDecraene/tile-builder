@@ -18,10 +18,16 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.3.3/rxjs.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.js" integrity="sha256-Nihli32xEO2dsnrW29M+krVxoeDblkRBTkk5ZLQJ6O8=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="js/jq.js"></script>
+  <script type="text/javascript" src="js/tinycolor.js"></script>
   <script type="text/javascript" src="canvas.js"></script>
   <script type="text/javascript" src="layer.js"></script>
   <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="js/array2d.js"></script>
   <script type="text/javascript" src="js/colorpicker.js"></script>
+  <script type="text/javascript" src="js/filechooser.js"></script>
+  <script type="text/javascript" src="js/imageloader.js"></script>
   <script type="text/javascript">
   </script>
 </head>
@@ -62,14 +68,12 @@
 
       </div>
     </div>
-    <div class="tileset">
-      <img id="tileset"/>
+    <div class="terrain ml20 mt20">
     </div>
-    <div class="images ml20 mt20">
-      <img id="preview"/>
-      <img id="preview-corner"/>
+    <div class="tileset ml20 mt20">
     </div>
-
+    <div class="btn btn-primary" id="export">Export</div>
+    <img id="exportResult"/>
     </div>
 </body>
 </html>

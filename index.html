@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Simple</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+  integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+  integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="stylesheet"  type="text/css"  href="styles.css">
+  <link rel="stylesheet"  type="text/css"  href="css/colorpicker.css">
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.3.3/rxjs.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="canvas.js"></script>
+  <script type="text/javascript" src="layer.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="js/colorpicker.js"></script>
+  <script type="text/javascript">
+  </script>
+</head>
+<body>
+<div class="editor">
+
+    <div class="stage-container">
+      <div class="tools">
+          <div>
+            <input type="radio" name="toolOption" value="eraser" checked>
+            <button class="btn btn-primary btn-small eraser">
+              <i class="fas fa-eraser"></i>
+            </button>
+          </div>
+      </div>
+      <div class="stage-body flex-row">
+        <div id="full-tile"/>
+
+        </div>
+        <div class="flex-column">
+          <div id="outer-corner-tile"/>
+
+          </div>
+          <div id="inner-corner-tile"/>
+
+          </div>
+        </div>
+        <div class="flex-column">
+          <div id="flat-top-tile"/>
+
+          </div>
+          <div id="corner-side-tile"/>
+
+          </div>
+        </div>
+      </div>
+      <div class="previews">
+
+      </div>
+    </div>
+    <div class="tileset">
+      <img id="tileset"/>
+    </div>
+    <div class="images ml20 mt20">
+      <img id="preview"/>
+      <img id="preview-corner"/>
+    </div>
+
+    </div>
+</body>
+</html>

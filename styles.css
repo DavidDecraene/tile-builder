@@ -1,0 +1,52 @@
+
+.mt20 { margin-top: 20px; }
+.ml20 { margin-left: 20px; }
+
+.tools {
+  margin-right: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+.tools > * {
+  display: flex;
+  margin-bottom: 5px !important;
+}
+.tools > * > * {
+  margin-right: 5px;
+}
+
+.col-swatch {
+  height: 30px;
+  width: 42px;
+  border-radius: 5px;
+}
+
+.editor { padding: 20px; }
+.stage-container {
+  padding-top: 20px;
+  background-color: #fafafa;
+  display: flex;
+}
+
+.stage-body {
+  flex-grow: 1;
+}
+
+.previews {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+}
+
+.stage-body > *, .previews > * {
+  margin-right: 10px;
+}

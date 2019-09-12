@@ -11,10 +11,10 @@ class FileChooser extends JQ {
         'image/svg+xml',
       'image/vnd.microsoft.icon'];
       this.$element = $('<div class="input-file"></div>');
-      this.$button = $('<button class="btn btn-primary">File</button>')
+      this.$button = $('<button class="btn btn-sm btn-primary">File</button>')
         .appendTo(this.$element)
         .click(() => this.selectFile());
-      this.$input = $('<input type="file" style="visibility: hidden;height: 0" class="input-ghost"/>')
+      this.$input = $('<input type="file" style="visibility: hidden;height: 0;width: 0" class="input-ghost"/>')
         .appendTo(this.$element)
         .change(f => {
           const files = f.target.files;

@@ -16,18 +16,24 @@
   display: flex;
   flex-direction: column;
 }
-.tools > * {
+.toolbar {
   display: flex;
-  margin-bottom: 5px !important;
-}
-.tools > * > * {
+  flex-direction: column;
   margin-right: 5px;
+  margin-top: 40px;
+}
+.toolbarButton {
+  margin-bottom: 10px !important;
 }
 
-.col-swatch {
+.col-swatch, .toolbarButton {
   height: 30px;
   width: 42px;
   border-radius: 5px;
+}
+
+.toolbarButton.selected {
+  box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5) !important;
 }
 
 .editor { padding: 20px; }
@@ -50,5 +56,17 @@
 .stage-body > *, .previews > * {
   margin-right: 10px;
 }
+
+.tile-holder {
+  display: flex;
+  flex-direction: column;
+}
+
+.tile-holder .input-file {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
 
 .tileset canvas { border: 1px solid #ccc; }

@@ -4,7 +4,7 @@ class ImageLoader extends JQ {
     constructor(options) {
       super();
       this.options = { ... {  }, ... options };
-      this.$element = $('<div></div>');
+      this.$element = $('<div class="image-loader"></div>');
       this.canvas = $('<canvas style="display: none"/>').appendTo(this.$element).get(0);
       this.img = new Image();
       this.img.onload = () => {

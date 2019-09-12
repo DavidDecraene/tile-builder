@@ -28,9 +28,7 @@ class TileSetCanvas extends JQ {
   }
 
   draw() {
-
       this.renderers.forEach(cv => {
-        console.log(cv);
         cv.draw();
       });
   }
@@ -41,13 +39,13 @@ class CanvasManager {
 
 
   constructor() {
+    this.toolbar = new Toolbar();
     this.drawCanvases = [];
     this.drawImages = [];
     this.tileCanvases = [];
     this.actions= [];
     this.updateableLayers = [];
     this.tilesets = [];
-    this.colorSwatches = [];
     this.body = new Layer(32, 32);
     this.corner1 = new Layer(32, 32);
     this.corner2 = this.addUpdateableLayer(new RotationLayer(this.corner1));
@@ -68,11 +66,9 @@ class CanvasManager {
     this.cornerSideRight = this.addUpdateableLayer(new RotationLayer(this.cornerSideUp));
     this.cornerSideDown = this.addUpdateableLayer(new RotationLayer(this.cornerSideRight));
     this.cornerAll = this.addUpdateableLayer(new MirrorYLayer(this.cornerSide));
-    this.eraser = new DataAdapter('eraser').setTransparent();
-    this.tool = this.eraser;
-    for (let i = 0 ; i < 8 ; i++) {
-      this.colorSwatches.push(new DataAdapter('color'+i));
-    }
+
+    this.undo = new DataAdapter('undo');
+
 
     $('body').keyup(e => {
       const event = e.originalEvent;
@@ -94,38 +90,40 @@ class CanvasManager {
     const action = this.actions.pop();
     if (action) {
       if (action.layer && action.x !== undefined && action.y !== undefined) {
-        const data = action.layer.getData(action.x, action.y);
-          console.log(action, 'pop', data);
-        if(this.adaptData(data, action.original)) {
-          console.log(data);
+        this.undo.configure(action.original);
+        if(this.performAction(this.undo, action.layer, action.x, action.y, true)) {
           this.drawAllCanvases();
         }
       }
     }
   }
 
-  adaptData(data, action) {
-    if (!data || !action) return;
-    if (action.clear) {
-      if (data.clear) return;
-      const old = { ... data };
-      data.clear = true;
-      delete data.color;
-      return { original: old };
-    } else if(action.color) {
-      if( data.color === action.color) return;
-      const old = { ... data };
-      data.color = action.color;
-      delete data.clear;
-      return { original: old };
+  performAction(action, layer, x, y, restore) {
+    if (x === undefined || y === undefined || layer === undefined) {
+      return;
     }
-
+    const data = layer.getData(x, y);
+    if (!action) {
+      action = this.toolbar.selection.action;
+    }
+    if (!action) { return; }
+    const event = action.doAction(data);
+    if (event) {
+      event.layer = layer;
+      event.x = x;
+      event.y = y;
+      if (!restore && event.undo) {
+        this.addUndoAction(event);
+      }
+    }
+    return event;
   }
 
-  onEditChange(ev) {
-    console.log('draw');
-    if (ev) this.actions.push(ev);
-    this.drawAllCanvases();
+  addUndoAction(ev) {
+    if (ev) {
+      this.actions.push(ev);
+      this.drawAllCanvases();
+    }
   }
 
 
@@ -173,28 +171,6 @@ class CanvasManager {
 
 }
 
-function createSwatch($par, col){
-  col.color = "#eee";
-  const r = $('<div/>').appendTo($par);
-  $('<input type="radio" name="toolOption">').attr('value', col.id).appendTo(r);
-  const $sw = $('<div class="col-swatch"></div>').attr('id', col.id).appendTo(r)
-    .css('backgroundColor', col.color).ColorPicker({
-  	color: col.color,
-  	onShow: function (colpkr) {
-  		//$(colpkr).fadeIn(500);
-  	//	return false;
-  	},
-  	onHide: function (colpkr) {
-  		$(colpkr).fadeOut(500);
-  		return false;
-  	},
-  	onChange: function (hsb, hex, rgb) {
-      col.color = '#' + hex;
-  		$sw.css('backgroundColor', col.color);
-  	}
-  });
-
-}
 
 $(document).ready(function() {
   const $stageBody = $('.stage-body');
@@ -231,12 +207,22 @@ $(document).ready(function() {
     stage.outerCorner1.transparent(pix[0], pix[1]);
     stage.cornerSide.transparent(pix[0], pix[1]);
   });
+
+  const iLoader = new ImageLoader({w: 32, h: 32}).appendTo($('#full-tile'));
+  iLoader.onLoad = (results) => {
+    console.log(results);
+    stage.body.replace(new Array2D(results).values);
+    stage.drawAllCanvases();
+  };
   stage.setFullTile(new Canvas(15, { id: 'full-tile', grid: true,  createElement: true }).appendTo($('#full-tile')).mainLayer(stage.body));
   stage.addCanvases(new Canvas(15, { id: 'corner', grid: true, w: 16, h: 16,  createElement: true }).appendTo($('#inner-corner-tile')).addLayer(stage.body).mainLayer(stage.corner1));
   stage.addCanvases(new Canvas(15, { id: 'outer-corner', grid: true, w: 16, h: 16,  createElement: true }).appendTo($('#outer-corner-tile')).addLayer(stage.body).mainLayer(stage.outerCorner1));
   stage.addCanvases(new Canvas(15, { id: 'flat-top', grid: true, w: 16, h: 16,  createElement: true }).appendTo($('#flat-top-tile')).addLayer(stage.body).mainLayer(stage.flatTop));
   const fullTile = stage.addTileCanvas(stage.fullTile.layers);
-  const c1 = stage.addTileCanvas(stage.body, stage.corner1);
+  const innerCorner1 = stage.addTileCanvas(stage.body, stage.corner1);
+  const innerCorner2 = stage.addTileCanvas(stage.body, stage.corner2);
+  const innerCorner3 = stage.addTileCanvas(stage.body, stage.corner3);
+  const innerCorner4 = stage.addTileCanvas(stage.body, stage.corner4);
   const c2 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2);
   const c2Bot = stage.addTileCanvas(stage.body, stage.corner3, stage.corner4);
   const c3 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2, stage.corner3);
@@ -245,7 +231,6 @@ $(document).ready(function() {
   const outerCorner2 = stage.addTileCanvas(stage.body, stage.outerCorner2);
   const outerCorner3 = stage.addTileCanvas(stage.body, stage.outerCorner3);
   const outerCorner4 = stage.addTileCanvas(stage.body, stage.outerCorner4);
-
   const cornerSide = stage.addTileCanvas(stage.body, stage.cornerSide);
   const cornerSideDown = stage.addTileCanvas(stage.body, stage.cornerSideDown);
   const cornerAll = stage.addTileCanvas(stage.body, stage.cornerAll);
@@ -259,27 +244,36 @@ $(document).ready(function() {
   const tCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.corner4, stage.corner3);
   const fCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.corner4);
   const cornerBend = stage.addTileCanvas(stage.body, stage.outerCorner1, stage.corner3);
-
-  stage.eraser.$element = $('#eraser');
-  stage.colorSwatches.forEach(col => {
-    createSwatch($tools, col);
-  });
-  const tileset = new TileSetCanvas(9, 5, 2).appendTo($tileset);
-  const terrainTiles = new TileSetCanvas(9, 5, 2).appendTo($terrain);
+  const toolbar = stage.toolbar.appendTo($tools);
+  toolbar.addButton(new IconButton(new DataAdapter('eraser').setTransparent(), 'fas fa-eraser'));
+  toolbar.addButton(new IconButton(new DataAdapter('pen'), 'fas fa-pen'));
+  toolbar.addButton(new IconButton(new DataAdapter('picker').configure({
+    onAction: (data) => {
+      if (!data.color) { return; }
+      const pen = toolbar.getButton('pen');
+      pen.action.setColor(data.color);
+      toolbar.selectButton(pen);
+    }
+  }), 'fas fa-eye-dropper'));
+  for (let i = 0 ; i < 8 ; i++) {
+    toolbar.addButton(new ColorSwatch(new DataAdapter('color'+i)));
+  }
+  const tileset = new TileSetCanvas(14, 1, 2).appendTo($tileset);
+  const terrainTiles = new TileSetCanvas(10, 5, 2).appendTo($terrain);
   tileset.addCanvas(0, 0, fullTile);
-  tileset.addCanvas(2, 0, c1);
-  tileset.addCanvas(4, 0, c2);
-  tileset.addCanvas(6, 0, c3);
-  tileset.addCanvas(8, 0, c4);
-  tileset.addCanvas(0, 2, outerCorner);
-  tileset.addCanvas(2, 2, cornerSide);
-  tileset.addCanvas(4, 2, cornerAll);
-  tileset.addCanvas(6, 2, flatTop);
-  tileset.addCanvas(8, 2, flatBoth);
-  tileset.addCanvas(0, 4, cornerOpposite);
-  tileset.addCanvas(2, 4, tCorner);
-  tileset.addCanvas(4, 4, fCorner);
-  tileset.addCanvas(6, 4, cornerBend);
+  tileset.addCanvas(1, 0, innerCorner1);
+  tileset.addCanvas(2, 0, c2);
+  tileset.addCanvas(3, 0, c3);
+  tileset.addCanvas(4, 0, c4);
+  tileset.addCanvas(5, 0, outerCorner);
+  tileset.addCanvas(6, 0, cornerSide);
+  tileset.addCanvas(7, 0, cornerAll);
+  tileset.addCanvas(8, 0, flatTop);
+  tileset.addCanvas(9, 0, flatBoth);
+  tileset.addCanvas(10, 0, cornerOpposite);
+  tileset.addCanvas(11, 0, tCorner);
+  tileset.addCanvas(12, 0, fCorner);
+  tileset.addCanvas(13, 0, cornerBend);
   terrainTiles.addCanvas(0, 0, outerCorner);
   terrainTiles.addCanvas(1, 0, flatTop);
   terrainTiles.addCanvas(2, 0, outerCorner2);
@@ -291,18 +285,22 @@ $(document).ready(function() {
   terrainTiles.addCanvas(2, 2, outerCorner3);
   terrainTiles.addCanvas(1, 3, flatBothV);
   terrainTiles.addCanvas(1, 4, cornerSideDown);
+  terrainTiles.addCanvas(5, 0, innerCorner3);
+  terrainTiles.addCanvas(6, 0, flatBot);
+  terrainTiles.addCanvas(7, 0, innerCorner4);
+  terrainTiles.addCanvas(7, 1, flatLeft);
+  terrainTiles.addCanvas(5, 1, flatRight);
+  terrainTiles.addCanvas(5, 2, innerCorner2);
+  terrainTiles.addCanvas(6, 2, flatTop);
+  terrainTiles.addCanvas(7, 2, innerCorner1);
+  terrainTiles.addCanvas(5, 3, fullTile);
+  terrainTiles.addCanvas(6, 3, fullTile);
+  terrainTiles.addCanvas(7, 3, fullTile);
   stage.tilesets.push(tileset);
   stage.tilesets.push(terrainTiles);
   stage.updateAllLayers();
   stage.drawAllCanvases();
   stage.updateAllImages();
-
-    const iLoader = new ImageLoader({w: 32, h: 32}).appendTo($('body'));
-    iLoader.onLoad = (results) => {
-      console.log(results);
-      stage.body.replace(new Array2D(results).values);
-      stage.drawAllCanvases();
-    };
 
     $('#export').click(() => {
       new ImageExporter().canvasToPng(tileset.canvas, $('#exportResult').get(0));

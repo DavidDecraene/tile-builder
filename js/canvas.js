@@ -17,21 +17,12 @@ class Canvas {
       this.canvas = this.$element.get(0);
       this.ctx = this.canvas.getContext("2d");
       this.$element.click((e) => {
-        console.log(this);
         if (!this.layer || !this.manager) { return;  }
         const pos = {
           x: Math.floor((e.pageX - this.canvas.offsetLeft) / this.scale),
           y:  Math.floor((e.pageY - this.canvas.offsetTop)  / this.scale)
         };
-        const change = this.manager.adaptData(this.layer.getData(pos.x, pos.y), this.manager.tool);
-        if(change) {
-          change.layer = this.layer;
-          change.x = pos.x;
-          change.y = pos.y;
-          console.log('ok');
-          this.manager.onEditChange(change);
-        }
-        console.log(pos, this.layer.getData(pos.x, pos.y, false));
+        this.manager.performAction(undefined, this.layer, pos.x, pos.y);
       });
     }
   }

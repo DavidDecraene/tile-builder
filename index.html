@@ -9,7 +9,7 @@
   integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
   integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-  <link rel="stylesheet"  type="text/css"  href="styles.css">
+  <link rel="stylesheet"  type="text/css"  href="css/styles.css">
   <link rel="stylesheet"  type="text/css"  href="css/colorpicker.css">
   <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -21,13 +21,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.js" integrity="sha256-Nihli32xEO2dsnrW29M+krVxoeDblkRBTkk5ZLQJ6O8=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="js/jq.js"></script>
   <script type="text/javascript" src="js/tinycolor.js"></script>
-  <script type="text/javascript" src="canvas.js"></script>
-  <script type="text/javascript" src="layer.js"></script>
-  <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="js/canvas.js"></script>
+  <script type="text/javascript" src="js/layer.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
   <script type="text/javascript" src="js/array2d.js"></script>
   <script type="text/javascript" src="js/colorpicker.js"></script>
   <script type="text/javascript" src="js/filechooser.js"></script>
   <script type="text/javascript" src="js/imageloader.js"></script>
+  <script type="text/javascript" src="js/toolbar.js"></script>
   <script type="text/javascript">
   </script>
 </head>
@@ -36,27 +37,21 @@
 
     <div class="stage-container">
       <div class="tools">
-          <div>
-            <input type="radio" name="toolOption" value="eraser" checked>
-            <button class="btn btn-primary btn-small eraser">
-              <i class="fas fa-eraser"></i>
-            </button>
-          </div>
       </div>
       <div class="stage-body flex-row">
-        <div id="full-tile"/>
+        <div id="full-tile" class="tile-holder"/>
 
         </div>
         <div class="flex-column">
-          <div id="outer-corner-tile"/>
+          <div id="outer-corner-tile" class="tile-holder"/>
 
           </div>
-          <div id="inner-corner-tile"/>
+          <div id="inner-corner-tile" class="tile-holder"/>
 
           </div>
         </div>
         <div class="flex-column">
-          <div id="flat-top-tile"/>
+          <div id="flat-top-tile" class="tile-holder"/>
 
           </div>
           <div id="corner-side-tile"/>

@@ -40,6 +40,9 @@ class CanvasManager {
 
   constructor() {
     this.toolbar = new Toolbar();
+    this.lifecycle = {
+      draw: true, layers: true, started: false
+    };
     this.drawCanvases = [];
     this.drawImages = [];
     this.tileCanvases = [];
@@ -79,6 +82,40 @@ class CanvasManager {
         }
       }
     });
+    this.update = this.update.bind(this);
+  }
+
+  start() {
+    if (this.lifecycle.started) { return; }
+    this.lifecycle.started = true;
+    this.update();
+  }
+
+  stop() {
+    this.lifecycle.started = false;
+    if (this.lifecycle.frame !== undefined) {
+      window.cancelAnimationFrame(this.lifecycle.frame);
+    }
+  }
+
+  update(timestamp) {
+    if (!this.lifecycle.started) { return; }
+    if(this.lifecycle.layers) {
+      this.updateableLayers.forEach(l => l.update());
+      this.lifecycle.layers = false;
+    }
+    if (this.lifecycle.draw) {
+      this.drawCanvases.forEach(cv => {
+        cv.draw()
+      });
+      this.tilesets.forEach(tileset => tileset.draw());
+      this.lifecycle.draw = false;
+    }
+    if (this.lifecycle.images) {
+      this.lifecycle.images = false;
+      this.drawImages.forEach(cv => cv.update());
+    }
+    this.lifecycle.frame = window.requestAnimationFrame(this.update);
   }
 
   addUpdateableLayer(l) {
@@ -92,7 +129,7 @@ class CanvasManager {
       if (action.layer && action.x !== undefined && action.y !== undefined) {
         this.undo.configure(action.original);
         if(this.performAction(this.undo, action.layer, action.x, action.y, true)) {
-          this.drawAllCanvases();
+          this.lifecycle.draw = true;
         }
       }
     }
@@ -122,15 +159,17 @@ class CanvasManager {
   addUndoAction(ev) {
     if (ev) {
       this.actions.push(ev);
-      this.drawAllCanvases();
+      this.lifecycle.draw = true;
     }
   }
 
+  addTileEditor(editor) {
+    this.addCanvases(editor.canvas);
+    editor.onChange.subscribe((_ev) => {
 
-  setFullTile(canvas) {
-    this.fullTile = canvas;
-    this.addCanvases(canvas);
-    return canvas;
+      this.lifecycle.draw = true;
+    });
+    return editor;
   }
 
   addTileCanvas(... layers) {
@@ -142,6 +181,7 @@ class CanvasManager {
   }
 
   addCanvases(canvases) {
+    if (!canvases) { return; }
     if (!Array.isArray(canvases)) { canvases = [ canvases]; }
     canvases.forEach(cv => {
       cv.manager = this;
@@ -150,23 +190,6 @@ class CanvasManager {
         this.drawImages.push(cv.image);
       }
     });
-  }
-
-
-
-  updateAllLayers() {
-    this.updateableLayers.forEach(l => l.update());
-  }
-
-  drawAllCanvases() {
-    this.drawCanvases.forEach(cv => {
-      cv.draw()
-    });
-    this.tilesets.forEach(tileset => tileset.draw());
-  }
-
-  updateAllImages() {
-    this.drawImages.forEach(cv => cv.update());
   }
 
 }
@@ -207,18 +230,15 @@ $(document).ready(function() {
     stage.outerCorner1.transparent(pix[0], pix[1]);
     stage.cornerSide.transparent(pix[0], pix[1]);
   });
-
-  const iLoader = new ImageLoader({w: 32, h: 32}).appendTo($('#full-tile'));
-  iLoader.onLoad = (results) => {
-    console.log(results);
-    stage.body.replace(new Array2D(results).values);
-    stage.drawAllCanvases();
-  };
-  stage.setFullTile(new Canvas(15, { id: 'full-tile', grid: true,  createElement: true }).appendTo($('#full-tile')).mainLayer(stage.body));
-  stage.addCanvases(new Canvas(15, { id: 'corner', grid: true, w: 16, h: 16,  createElement: true }).appendTo($('#inner-corner-tile')).addLayer(stage.body).mainLayer(stage.corner1));
-  stage.addCanvases(new Canvas(15, { id: 'outer-corner', grid: true, w: 16, h: 16,  createElement: true }).appendTo($('#outer-corner-tile')).addLayer(stage.body).mainLayer(stage.outerCorner1));
-  stage.addCanvases(new Canvas(15, { id: 'flat-top', grid: true, w: 16, h: 16,  createElement: true }).appendTo($('#flat-top-tile')).addLayer(stage.body).mainLayer(stage.flatTop));
-  const fullTile = stage.addTileCanvas(stage.fullTile.layers);
+  stage.addTileEditor(new TileEditor($('#full-tile'))
+    .useCanvas(new Canvas(15, {  grid: true,  createElement: true }).mainLayer(stage.body)));
+  stage.addTileEditor(new TileEditor($('#outer-corner-tile'))
+    .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.outerCorner1)));
+  stage.addTileEditor(new TileEditor($('#inner-corner-tile'))
+    .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.corner1)));
+  stage.addTileEditor(new TileEditor($('#flat-top-tile'))
+    .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.flatTop)));
+  const fullTile = stage.addTileCanvas(stage.body);
   const innerCorner1 = stage.addTileCanvas(stage.body, stage.corner1);
   const innerCorner2 = stage.addTileCanvas(stage.body, stage.corner2);
   const innerCorner3 = stage.addTileCanvas(stage.body, stage.corner3);
@@ -298,9 +318,7 @@ $(document).ready(function() {
   terrainTiles.addCanvas(7, 3, fullTile);
   stage.tilesets.push(tileset);
   stage.tilesets.push(terrainTiles);
-  stage.updateAllLayers();
-  stage.drawAllCanvases();
-  stage.updateAllImages();
+  stage.start();
 
     $('#export').click(() => {
       new ImageExporter().canvasToPng(tileset.canvas, $('#exportResult').get(0));

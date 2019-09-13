@@ -1,11 +1,21 @@
 
 .mt20 { margin-top: 20px; }
 .ml20 { margin-left: 20px; }
+.ml5 { margin-left: 5px; }
 
 .tools {
   margin-right: 5px;
   display: flex;
   flex-direction: column;
+  background-color: #2d343f;
+  width: 65px;
+}
+
+.title {
+  background-color: #383e49;
+  padding: 15px;
+  color: white;
+
 }
 
 .flex-row {
@@ -21,6 +31,7 @@
   flex-direction: column;
   margin-right: 5px;
   margin-top: 40px;
+  margin-left: 10px;
 }
 .toolbarButton {
   margin-bottom: 10px !important;
@@ -36,15 +47,14 @@
   box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5) !important;
 }
 
-.editor { padding: 20px; }
 .stage-container {
-  padding-top: 20px;
   background-color: #fafafa;
   display: flex;
 }
 
 .stage-body {
   flex-grow: 1;
+  padding-top: 10px;
 }
 
 .previews {
@@ -58,13 +68,11 @@
 }
 
 .tile-holder {
-  display: flex;
-  flex-direction: column;
 }
 
 .tile-holder .input-file {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   margin-bottom: 5px;
 }
 

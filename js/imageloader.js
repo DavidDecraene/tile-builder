@@ -3,7 +3,10 @@
 class ImageLoader extends JQ {
     constructor(options) {
       super();
-      this.options = { ... {  }, ... options };
+      this.options = { ... {
+        clearColor: '#fff'
+      }, ... options };
+      this.clearColor = tinycolor(this.options.clearColor).toHexString();
       this.$element = $('<div class="image-loader"></div>');
       this.canvas = $('<canvas style="display: none"/>').appendTo(this.$element).get(0);
       this.img = new Image();
@@ -13,7 +16,6 @@ class ImageLoader extends JQ {
         const h = this.canvas.height = this.options.h ? Math.min(this.options.h, this.img.height) :this.img.height;
         const ctx = this.canvas.getContext('2d');
         ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height);
-        console.log(w, h);
 
         const result = [];
         for(let x = 0; x < w; x++) {
@@ -22,7 +24,13 @@ class ImageLoader extends JQ {
             const data = ctx.getImageData(x, y, 1, 1).data;
             var [ r, g, b, a] = data;
             if (a) {
-              row[y] = { color: tinycolor({ r, g, b }).toHexString() };
+              const colr = tinycolor({ r, g, b }).toHexString();
+              if (colr === this.clearColor) {
+                row[y] = { clear: true };
+
+              } else {
+                row[y] = { color: colr };
+              }
             }
           }
         }

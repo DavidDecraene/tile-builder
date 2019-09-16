@@ -1,14 +1,24 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 9 */
 class TileEditor extends JQ {
-  constructor($element) {
+  constructor($element, options) {
     super();
+    this.options = {   ... {}, ... options    };
     this.onChange = new rxjs.Subject();
     this.$element = $element ? $element : $('<div/>');
   }
 
+  bounds(dimension) {
+    this.dimension = dimension;
+    return this;
+  }
+
   loadFile(results) {
 
-    this.canvas.layer.replace(results);
+    this.canvas.layer.replace(results, this.dimension);
+    if (this.canvas.manager) {
+      this.canvas.manager.lifecycle.layers = true;
+      this.canvas.manager.lifecycle.draw = true;
+    }
     this.onChange.next({ 'type': 'file' });
   }
 

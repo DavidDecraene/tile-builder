@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 9 */
 class Layer {
   constructor(w, h) {
     this.width = w;
@@ -38,14 +38,17 @@ class Layer {
     delete data.color;
   }
 
-    replace(pix) {
-      for(let i=0; i< pix.length; i++) {
-        const row = pix[i];
-        for(let j = 0; j < row.length; j++) {
-          this.setData(i, j, row[j]);
-        }
+  replace(pix, dimension) {
+    const opts = { ... { x: 0, y: 0, w: this.width, h: this.height }, ... dimension };
+    const w = Math.min(pix.length, opts.x + opts.w);
+    for(let i=opts.x; i< w; i++) {
+      const row = pix[i];
+      const h = Math.min(row.length, opts.y + opts.h);
+      for(let j = opts.y; j < h; j++) {
+        this.setData(i, j, row[j]);
       }
     }
+  }
 
 
   mirrorXAxis(layer) {

@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 9 */
 // jshint ignore: start
 
 
@@ -232,11 +232,11 @@ $(document).ready(function() {
   });
   stage.addTileEditor(new TileEditor($('#full-tile'))
     .useCanvas(new Canvas(15, {  grid: true,  createElement: true }).mainLayer(stage.body)));
-  stage.addTileEditor(new TileEditor($('#outer-corner-tile'))
+  stage.addTileEditor(new TileEditor($('#outer-corner-tile')).bounds({ w: 16, h: 16 })
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.outerCorner1)));
-  stage.addTileEditor(new TileEditor($('#inner-corner-tile'))
+  stage.addTileEditor(new TileEditor($('#inner-corner-tile')).bounds({ w: 16, h: 16 })
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.corner1)));
-  stage.addTileEditor(new TileEditor($('#flat-top-tile'))
+  stage.addTileEditor(new TileEditor($('#flat-top-tile')).bounds({x: 8, w: 16, h: 16 })
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.flatTop)));
   const fullTile = stage.addTileCanvas(stage.body);
   const innerCorner1 = stage.addTileCanvas(stage.body, stage.corner1);

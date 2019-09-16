@@ -50,25 +50,18 @@ class CanvasManager {
     this.updateableLayers = [];
     this.tilesets = [];
     this.body = new Layer(32, 32);
-    this.corner1 = new Layer(32, 32);
+    this.corner1 = new Layer(16, 16);
     this.corner2 = this.addUpdateableLayer(new RotationLayer(this.corner1));
     this.corner3 = this.addUpdateableLayer(new RotationLayer(this.corner2));
     this.corner4 = this.addUpdateableLayer(new RotationLayer(this.corner3));
-    this.flatTop = new Layer(32, 32);
+    this.flatTop = new Layer(16, 16);
     this.flatRight = this.addUpdateableLayer(new RotationLayer(this.flatTop));
     this.flatBot = this.addUpdateableLayer(new RotationLayer(this.flatRight));
     this.flatLeft = this.addUpdateableLayer(new RotationLayer(this.flatBot));
-    this.flatBoth = this.addUpdateableLayer(new MirrorXLayer(this.flatTop));
-    this.flatBothV = this.addUpdateableLayer(new RotationLayer(this.flatBoth));
-    this.outerCorner1 = new Layer(32, 32);
+    this.outerCorner1 = new Layer(16, 16);
     this.outerCorner2 = this.addUpdateableLayer(new RotationLayer(this.outerCorner1));
     this.outerCorner3 = this.addUpdateableLayer(new RotationLayer(this.outerCorner2));
     this.outerCorner4 = this.addUpdateableLayer(new RotationLayer(this.outerCorner3));
-    this.cornerSide =  this.addUpdateableLayer(new MirrorXLayer(this.outerCorner1));
-    this.cornerSideUp = this.addUpdateableLayer(new RotationLayer(this.cornerSide));
-    this.cornerSideRight = this.addUpdateableLayer(new RotationLayer(this.cornerSideUp));
-    this.cornerSideDown = this.addUpdateableLayer(new RotationLayer(this.cornerSideRight));
-    this.cornerAll = this.addUpdateableLayer(new MirrorYLayer(this.cornerSide));
 
     this.undo = new DataAdapter('undo');
 
@@ -129,6 +122,7 @@ class CanvasManager {
       if (action.layer && action.x !== undefined && action.y !== undefined) {
         this.undo.configure(action.original);
         if(this.performAction(this.undo, action.layer, action.x, action.y, true)) {
+          this.lifecycle.layers = true;
           this.lifecycle.draw = true;
         }
       }
@@ -159,6 +153,7 @@ class CanvasManager {
   addUndoAction(ev) {
     if (ev) {
       this.actions.push(ev);
+      this.lifecycle.layers = true;
       this.lifecycle.draw = true;
     }
   }
@@ -166,7 +161,7 @@ class CanvasManager {
   addTileEditor(editor) {
     this.addCanvases(editor.canvas);
     editor.onChange.subscribe((_ev) => {
-
+      this.lifecycle.layers = true;
       this.lifecycle.draw = true;
     });
     return editor;
@@ -213,22 +208,19 @@ $(document).ready(function() {
   ].forEach(corner => {
     stage.corner1.transparent(corner[0], corner[1]);
   });
-  for(let x = 0; x < 32; x++) {
+  for(let x = 0; x < 16; x++) {
     for (let y= 0; y < 3; y++) {
       stage.outerCorner1.transparent(x, y);
       stage.flatTop.transparent(x, y);
-      stage.cornerSide.transparent(x, y);
     }
   }
   for(let x = 0; x < 3; x++) {
-    for (let y= 3; y < 32; y++) {
+    for (let y= 3; y < 16; y++) {
       stage.outerCorner1.transparent(x, y);
-      stage.cornerSide.transparent(x, y);
     }
   }
   [[3, 4], [3, 3], [4, 3]].forEach(pix => {
     stage.outerCorner1.transparent(pix[0], pix[1]);
-    stage.cornerSide.transparent(pix[0], pix[1]);
   });
   stage.addTileEditor(new TileEditor($('#full-tile'))
     .useCanvas(new Canvas(15, {  grid: true,  createElement: true }).mainLayer(stage.body)));
@@ -236,34 +228,37 @@ $(document).ready(function() {
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.outerCorner1)));
   stage.addTileEditor(new TileEditor($('#inner-corner-tile')).bounds({ w: 16, h: 16 })
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.corner1)));
-  stage.addTileEditor(new TileEditor($('#flat-top-tile')).bounds({x: 8, w: 16, h: 16 })
+  stage.addTileEditor(new TileEditor($('#flat-top-tile')).bounds({w: 16, h: 16 }, { x: 16 })
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.flatTop)));
   const fullTile = stage.addTileCanvas(stage.body);
   const innerCorner1 = stage.addTileCanvas(stage.body, stage.corner1);
-  const innerCorner2 = stage.addTileCanvas(stage.body, stage.corner2);
-  const innerCorner3 = stage.addTileCanvas(stage.body, stage.corner3);
-  const innerCorner4 = stage.addTileCanvas(stage.body, stage.corner4);
-  const c2 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2);
-  const c2Bot = stage.addTileCanvas(stage.body, stage.corner3, stage.corner4);
-  const c3 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2, stage.corner3);
-  const c4 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2, stage.corner3, stage.corner4);
-  const outerCorner = stage.addTileCanvas(stage.body, stage.outerCorner1);
-  const outerCorner2 = stage.addTileCanvas(stage.body, stage.outerCorner2);
-  const outerCorner3 = stage.addTileCanvas(stage.body, stage.outerCorner3);
-  const outerCorner4 = stage.addTileCanvas(stage.body, stage.outerCorner4);
-  const cornerSide = stage.addTileCanvas(stage.body, stage.cornerSide);
-  const cornerSideDown = stage.addTileCanvas(stage.body, stage.cornerSideDown);
-  const cornerAll = stage.addTileCanvas(stage.body, stage.cornerAll);
-  const flatTop = stage.addTileCanvas(stage.body, stage.flatTop);
-  const flatRight = stage.addTileCanvas(stage.body, stage.flatRight);
-  const flatBot = stage.addTileCanvas(stage.body, stage.flatBot);
-  const flatLeft = stage.addTileCanvas(stage.body, stage.flatLeft);
-  const flatBoth = stage.addTileCanvas(stage.body, stage.flatBoth);
-  const flatBothV = stage.addTileCanvas(stage.body, stage.flatBothV);
-  const cornerOpposite = stage.addTileCanvas(stage.body, stage.corner1, stage.corner3);
-  const tCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.corner4, stage.corner3);
-  const fCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.corner4);
-  const cornerBend = stage.addTileCanvas(stage.body, stage.outerCorner1, stage.corner3);
+  const innerCorner2 = stage.addTileCanvas(stage.body, stage.corner2.translate(16, 0));
+  const innerCorner3 = stage.addTileCanvas(stage.body, stage.corner3.translate(16, 16));
+  const innerCorner4 = stage.addTileCanvas(stage.body, stage.corner4.translate(0, 16));
+  const c2 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2.translate(16, 0));
+  const c2Bot = stage.addTileCanvas(stage.body, stage.corner3.translate(16, 16), stage.corner4.translate(0, 16));
+  const c3 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2.translate(16, 0), stage.corner3.translate(16, 16));
+  const c4 = stage.addTileCanvas(stage.body, stage.corner1, stage.corner2.translate(16, 0), stage.corner3.translate(16, 16), stage.corner4.translate(0, 16));
+  const outerCorner = stage.addTileCanvas(stage.body, stage.flatLeft.translate(0, 16), stage.outerCorner1, stage.flatTop.translate(16, 0));
+  const outerCorner2 = stage.addTileCanvas(stage.body, stage.flatTop, stage.outerCorner2.translate(16, 0), stage.flatRight.translate(16, 16));
+  const outerCorner3 = stage.addTileCanvas(stage.body, stage.flatRight.translate(16, 0), stage.outerCorner3.translate(16, 16), stage.flatBot.translate(0, 16));
+  const outerCorner4 = stage.addTileCanvas(stage.body, stage.flatLeft, stage.outerCorner4.translate(0, 16), stage.flatBot.translate(16, 16));
+  const cornerSide = stage.addTileCanvas(stage.body, stage.outerCorner1, stage.flatTop.translate(16, 0),  stage.outerCorner4.translate(0, 16), stage.flatBot.translate(16, 16));
+  const cornerSideDown = stage.addTileCanvas(stage.body, stage.flatLeft, stage.outerCorner4.translate(0, 16), stage.flatRight.translate(16, 0), stage.outerCorner3.translate(16, 16));
+  const cornerAll = stage.addTileCanvas(stage.body, stage.outerCorner4.translate(0, 16), stage.outerCorner3.translate(16, 16), stage.outerCorner2.translate(16, 0), stage.outerCorner1);
+
+  const flatTop = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0));
+  const flatRight = stage.addTileCanvas(stage.body, stage.flatRight.translate(16, 0), stage.flatRight.translate(16, 16));
+  const flatBot = stage.addTileCanvas(stage.body, stage.flatBot.translate(0, 16), stage.flatBot.translate(16, 16));
+  const flatLeft = stage.addTileCanvas(stage.body, stage.flatLeft, stage.flatLeft.translate(0, 16));
+  const flatBoth = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.flatBot.translate(0, 16), stage.flatBot.translate(16, 16));
+  const flatBothV = stage.addTileCanvas(stage.body, stage.flatLeft, stage.flatLeft.translate(0, 16), stage.flatRight.translate(16, 0), stage.flatRight.translate(16, 16));
+
+  const cornerOpposite = stage.addTileCanvas(stage.body, stage.corner1, stage.corner3.translate(16, 16));
+
+  const tCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.corner4.translate(0, 16), stage.corner3.translate(16, 16));
+  const fCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.corner4.translate(0, 16));
+  const cornerBend = stage.addTileCanvas(stage.body, stage.flatLeft.translate(0, 16), stage.outerCorner1, stage.flatTop.translate(16, 0), stage.corner3.translate(16, 16));
   const toolbar = stage.toolbar.appendTo($tools);
   toolbar.addButton(new IconButton(new DataAdapter('eraser').setTransparent(), 'fas fa-eraser'));
   toolbar.addButton(new IconButton(new DataAdapter('pen'), 'fas fa-pen'));
@@ -294,6 +289,7 @@ $(document).ready(function() {
   tileset.addCanvas(11, 0, tCorner);
   tileset.addCanvas(12, 0, fCorner);
   tileset.addCanvas(13, 0, cornerBend);
+
   terrainTiles.addCanvas(0, 0, outerCorner);
   terrainTiles.addCanvas(1, 0, flatTop);
   terrainTiles.addCanvas(2, 0, outerCorner2);

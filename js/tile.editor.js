@@ -7,8 +7,9 @@ class TileEditor extends JQ {
     this.$element = $element ? $element : $('<div/>');
   }
 
-  bounds(dimension) {
+  bounds(dimension, imageOptions) {
     this.dimension = dimension;
+    this.imageOptions = imageOptions;
     return this;
   }
 
@@ -23,7 +24,8 @@ class TileEditor extends JQ {
   }
 
   useCanvas(canvas) {
-    this.loader = new ImageLoader({w: canvas.layer.width, h: canvas.layer.height}).appendTo(this.$element);
+    const opts = { ... { w: canvas.layer.width, h: canvas.layer.height }, ... this.imageOptions };
+    this.loader = new ImageLoader(opts).appendTo(this.$element);
     this.loader.onLoad = this.loadFile.bind(this);
     console.log(canvas);
     this.canvas = canvas;

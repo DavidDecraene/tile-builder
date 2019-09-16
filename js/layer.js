@@ -3,7 +3,18 @@ class Layer {
   constructor(w, h) {
     this.width = w;
     this.height = h;
+    this.offset = {  x: 0, y: 0 };
     this.pix = [];
+  }
+
+  getValues() {
+    return this.pix;
+  }
+
+  useOffSet(x, y) {
+    this.offset.x = x;
+    this.offset.y = y;
+    return this;
   }
 
   getData(x, y, create = true) {
@@ -39,13 +50,13 @@ class Layer {
   }
 
   replace(pix, dimension) {
-    const opts = { ... { x: 0, y: 0, w: this.width, h: this.height }, ... dimension };
+    const opts = { ... { x: 0, y: 0, w: this.width, h: this.height, dx: 0, dy: 0 }, ... dimension };
     const w = Math.min(pix.length, opts.x + opts.w);
     for(let i=opts.x; i< w; i++) {
       const row = pix[i];
       const h = Math.min(row.length, opts.y + opts.h);
       for(let j = opts.y; j < h; j++) {
-        this.setData(i, j, row[j]);
+        this.setData(i - opts.dx, j - opts.dy, row[j]);
       }
     }
   }
@@ -84,6 +95,12 @@ class Layer {
 
   flip(layer, horizontal) {
 
+  }
+
+  translate(x, y, layer) {
+    if (!layer) { layer = new CopyLayer(this); }
+    layer.useOffSet(x + layer.offset.x, y + layer.offset.y);
+    return layer;
   }
 
   rotate(layer) {
@@ -127,6 +144,19 @@ class Layer {
 
 }
 
+class CopyLayer extends Layer {
+
+  constructor(parent) {
+    super(parent.width, parent.height);
+    this.parent = parent;
+  }
+
+  getValues() {
+    return this.parent.getValues();
+  }
+
+}
+
 class RotationLayer extends Layer {
   constructor(parent) {
     super(parent.width, parent.height);
@@ -137,6 +167,8 @@ class RotationLayer extends Layer {
     this.parent.rotate(this);
   }
 }
+
+/**
 
 class MirrorYLayer extends Layer {
   constructor(parent) {
@@ -158,4 +190,4 @@ class MirrorXLayer extends Layer {
   update() {
     this.parent.mirrorXAxis(this);
   }
-}
+} */

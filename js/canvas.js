@@ -91,18 +91,20 @@ class Canvas {
       layers = [layers];
     }
     layers.forEach(layer => {
-      const pix = layer.pix;
+      const pix = layer.getValues();
       for(var x =0 ; x < pix.length; x++) {
         const row = pix[x];
         if (!row) { continue; }
         for(var y = 0; y < row.length; y++) {
           const data = row[y];
           if (!data) { continue; }
+          const xR = cx + x * this.scale + layer.offset.x * this.scale;
+          const yR = cy + y * this.scale + layer.offset.y * this.scale;
           if (data.clear) {
-            ctx.clearRect(cx + x * this.scale, cy + y * this.scale, this.scale, this.scale);
+            ctx.clearRect(xR, yR, this.scale, this.scale);
           } else {
             ctx.fillStyle = data.color;
-            ctx.fillRect(cx + x * this.scale, cy + y * this.scale, this.scale, this.scale);
+            ctx.fillRect(xR, yR, this.scale, this.scale);
           }
         }
       }

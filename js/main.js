@@ -258,6 +258,7 @@ $(document).ready(function() {
 
   const tCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.corner4.translate(0, 16), stage.corner3.translate(16, 16));
   const fCorner = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.corner4.translate(0, 16));
+  const fCornerMirror = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.corner3.translate(16, 16));
   const fCorner2 = stage.addTileCanvas(stage.body, stage.flatTop, stage.flatTop.translate(16, 0), stage.corner3.translate(16, 16));
   const cornerBend = stage.addTileCanvas(stage.body, stage.flatLeft.translate(0, 16), stage.outerCorner1, stage.flatTop.translate(16, 0), stage.corner3.translate(16, 16));
   const toolbar = stage.toolbar.appendTo($tools);
@@ -274,7 +275,7 @@ $(document).ready(function() {
   for (let i = 0 ; i < 8 ; i++) {
     toolbar.addButton(new ColorSwatch(new DataAdapter('color'+i)));
   }
-  const tileset = new TileSetCanvas(15, 1, 2).appendTo($tileset);
+  const tileset = new TileSetCanvas(16, 1, 2).appendTo($tileset);
   const terrainTiles = new TileSetCanvas(10, 5, 2).appendTo($terrain);
   tileset.addCanvas(0, 0, fullTile);
   tileset.addCanvas(1, 0, innerCorner1);
@@ -289,8 +290,9 @@ $(document).ready(function() {
   tileset.addCanvas(10, 0, cornerOpposite);
   tileset.addCanvas(11, 0, tCorner);
   tileset.addCanvas(12, 0, fCorner);
-  tileset.addCanvas(13, 0, fCorner2);
-  tileset.addCanvas(14, 0, cornerBend);
+  tileset.addCanvas(13, 0, fCornerMirror);
+  tileset.addCanvas(14, 0, fCorner2);
+  tileset.addCanvas(15, 0, cornerBend);
 
   terrainTiles.addCanvas(0, 0, outerCorner);
   terrainTiles.addCanvas(1, 0, flatTop);

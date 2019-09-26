@@ -33,10 +33,12 @@ class Array2D {
      return this;
    }
 
-   rotate(w, h, target = this) {
+   rotate(target = this) {
      //const x = Math.floor(n/ 2);
      //const y = n - 1;
      // Consider all squares one by one
+     const h = this.values.length;
+
      for (var x = 0; x < h / 2; x++)
      {
          // Consider elements in group of 4 in
@@ -60,6 +62,20 @@ class Array2D {
          }
      }
      return target;
+   }
+
+   splice(dx = 0, dy = 0, w = 32, h = 32) {
+     const result = new Array2D();
+     const arr = this.values;
+     const dw = Math.min(dx + w, arr.length);
+     for(let x = dx; x < dw; x++) {
+       const row = arr[x];
+       const dh = Math.min(dy + h, row.length);
+       for(let y = dy; y < dh; y++) {
+         result.setData(x - dx, y - dy, row[y]);
+       }
+     }
+     return result;
    }
 
 

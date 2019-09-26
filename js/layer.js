@@ -105,10 +105,10 @@ class Layer {
 
   rotate(layer) {
     const mat = [];
-    const N = this.height;
-    for(let i=0; i< this.width; i++) {
+    const N = this.width;
+    for(let i=0; i< this.height; i++) {
       mat[i] = [];
-      for(let j=0;j<this.height; j++) {
+      for(let j=0;j<this.width; j++) {
         mat[i][j] = this.getData(i, j, false);
       }
     }

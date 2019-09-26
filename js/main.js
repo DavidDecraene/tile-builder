@@ -224,11 +224,11 @@ $(document).ready(function() {
   });
   stage.addTileEditor(new TileEditor($('#full-tile'))
     .useCanvas(new Canvas(15, {  grid: true,  createElement: true }).mainLayer(stage.body)));
-  stage.addTileEditor(new TileEditor($('#outer-corner-tile')).bounds({ w: 16, h: 16 })
+  const oCornerEditor = stage.addTileEditor(new TileEditor($('#outer-corner-tile')).bounds({ w: 16, h: 16 }, { button: 'outer corner'})
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.outerCorner1)));
-  stage.addTileEditor(new TileEditor($('#inner-corner-tile')).bounds({ w: 16, h: 16 })
+  const oInnerCornerEditor = stage.addTileEditor(new TileEditor($('#inner-corner-tile')).bounds({ w: 16, h: 16 }, { button: 'inner corner'})
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.corner1)));
-  stage.addTileEditor(new TileEditor($('#flat-top-tile')).bounds({w: 16, h: 16 }, { x: 16 })
+  const oSideEditor = stage.addTileEditor(new TileEditor($('#flat-top-tile')).bounds({w: 16, h: 16 }, { x: 16, button: 'side' })
     .useCanvas(new Canvas(15, { grid: true, w: 16, h: 16,  createElement: true }).addLayer(stage.body).mainLayer(stage.flatTop)));
   const fullTile = stage.addTileCanvas(stage.body);
   const innerCorner1 = stage.addTileCanvas(stage.body, stage.corner1);
@@ -275,7 +275,7 @@ $(document).ready(function() {
   for (let i = 0 ; i < 8 ; i++) {
     toolbar.addButton(new ColorSwatch(new DataAdapter('color'+i)));
   }
-  const tileset = new TileSetCanvas(16, 1, 2).appendTo($tileset);
+  const tileset = new TileSetCanvas(16, 1, 1).appendTo($tileset);
   const terrainTiles = new TileSetCanvas(10, 5, 2).appendTo($terrain);
   tileset.addCanvas(0, 0, fullTile);
   tileset.addCanvas(1, 0, innerCorner1);
@@ -319,6 +319,17 @@ $(document).ready(function() {
   stage.tilesets.push(tileset);
   stage.tilesets.push(terrainTiles);
   stage.start();
+
+  const loadBorders = new ImageLoader({
+    w: 32, h: 32, button: 'loadBorders'
+  }).appendTo($('#loadAll'));
+  loadBorders.onLoad = (arr) => {
+    const r = new Array2D(arr);
+    console.log('a', arr, r);
+    oCornerEditor.loadFile(r.splice(0, 0, 16, 16).values);
+    oSideEditor.loadFile(r.splice(16, 0, 16, 16).values);
+    oInnerCornerEditor.loadFile(r.splice(16, 16, 16, 16).rotate().rotate().values);
+  };
 
     $('#export').click(() => {
       new ImageExporter().canvasToPng(tileset.canvas, $('#exportResult').get(0));

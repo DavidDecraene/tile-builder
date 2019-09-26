@@ -4,7 +4,7 @@ class ImageLoader extends JQ {
     constructor(options) {
       super();
       this.options = { ... {
-        x: 0, y: 0,
+        x: 0, y: 0, button: 'File',
         clearColor: '#fff'
       }, ... options };
       this.clearColor = tinycolor(this.options.clearColor).toHexString();
@@ -40,7 +40,7 @@ class ImageLoader extends JQ {
         }
       }
       this.$img = $('<img style="display: none"/>').appendTo(this.$element);
-      this.fileChooser =  new FileChooser().appendTo(this);
+      this.fileChooser =  new FileChooser(this.options.button).appendTo(this);
       this.fileChooser.onLoad = (data) => {
         this.img.src = data;
       };

@@ -27,7 +27,6 @@ class TileEditor extends JQ {
     const opts = { ... { w: canvas.layer.width, h: canvas.layer.height }, ... this.imageOptions };
     this.loader = new ImageLoader(opts).appendTo(this.$element);
     this.loader.onLoad = this.loadFile.bind(this);
-    console.log(canvas);
     this.canvas = canvas;
     canvas.appendTo(this.$element);
     return this;

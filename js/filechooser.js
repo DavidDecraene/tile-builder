@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 class FileChooser extends JQ {
-    constructor() {
+    constructor(name = 'File') {
       super();
       this.mimeTypes = [
         'image/jpeg',
@@ -11,7 +11,7 @@ class FileChooser extends JQ {
         'image/svg+xml',
       'image/vnd.microsoft.icon'];
       this.$element = $('<div class="input-file"></div>');
-      this.$button = $('<button class="btn btn-sm btn-primary">File</button>')
+      this.$button = $('<button class="btn btn-sm btn-primary"></button>').text(name)
         .appendTo(this.$element)
         .click(() => this.selectFile());
       this.$input = $('<input type="file" style="visibility: hidden;height: 0;width: 0" class="input-ghost"/>')
